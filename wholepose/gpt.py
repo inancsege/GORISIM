@@ -6,9 +6,9 @@ import openai
 list_of_words_str =sys.argv[1]
 
 
-openai.api_key = "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"
+openai.api_key = "Your Key Here"
 
-prompt = f"{list_of_words_str} cümlesi Türkçe kurallarına uygun değil. Bu cümleyi Türkçe kurallarına uygun bir hale getir. Bu cümle bir uygulamada kullanılacağından ötürü açıklama yapma sadece çıktıyı yaz. Sadece cümleyi yaz."
+prompt = f"{list_of_words_str} cÃ¼mlesi TÃ¼rkÃ§e kurallarÃ½na uygun deÃ°il. Bu cÃ¼mleyi TÃ¼rkÃ§e kurallarÃ½na uygun bir hale getir. Bu cÃ¼mle bir uygulamada kullanÃ½lacaÃ°Ã½ndan Ã¶tÃ¼rÃ¼ aÃ§Ã½klama yapma sadece Ã§Ã½ktÃ½yÃ½ yaz. Sadece cÃ¼mleyi yaz."
 
 try:
     result = openai.ChatCompletion.create(
