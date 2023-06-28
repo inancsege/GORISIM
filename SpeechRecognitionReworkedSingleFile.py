@@ -177,8 +177,8 @@ if __name__ == '__main__':
 
     text = recognizer.recognize(filename=file_path)
 
-    openai.api_key = "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"
-    prompt = f'"{text}" cümlesindeki kelimelerin köklerini aralarına boşluk bırakarak yazdır. Sadece kelime köklerini yazdır.Sadece kelime köklerini yazdır. Sadece kelime köklerini yazdır.Sadece kelime köklerini yazdır.Sadece kelime köklerini yazdır.'
+    openai.api_key = "yout key"
+    prompt = f'"{text}" cÃ¼mlesindeki kelimelerin kÃ¶klerini aralarÃ½na boÃ¾luk bÃ½rakarak yazdÃ½r. Sadece kelime kÃ¶klerini yazdÃ½r.Sadece kelime kÃ¶klerini yazdÃ½r. Sadece kelime kÃ¶klerini yazdÃ½r.Sadece kelime kÃ¶klerini yazdÃ½r.Sadece kelime kÃ¶klerini yazdÃ½r.'
 
     try:
         result = openai.ChatCompletion.create(
