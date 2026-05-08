@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import hashlib
 import sys
-from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -16,7 +15,6 @@ class Asset:
     target: Path
     url: str | None  # None => fetched via huggingface_hub
     sha256: str | None
-    fetcher: Callable[[Asset], None] | None = None
 
 
 def ensure_dirs(models_dir: Path, data_dir: Path) -> None:
@@ -42,7 +40,8 @@ def _sha256(p: Path) -> str:
     return h.hexdigest()
 
 
-# Manifest is built lazily so tests can monkeypatch settings paths.
+# `_build_manifest()` is exposed so callers can rebuild the manifest after settings change;
+# the module-level `MANIFEST` is a snapshot taken at import.
 def _build_manifest() -> list[Asset]:
     s = get_settings()
     m = s.models_dir
