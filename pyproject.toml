@@ -60,6 +60,18 @@ addopts = "-ra"
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+extend-exclude = [
+  "src/gorisim/sign_to_text/models/pose_hrnet.py",
+  "src/gorisim/sign_to_text/models/resnet2plus1d.py",
+  "src/gorisim/sign_to_text/utils.py",
+  "src/gorisim/sign_to_text/models/hrnet_config",
+  "wholepose",
+  "SpeakerVerification.py",
+  "SpeechRecogniitonOptimized.py",
+  "SpeechRecognition.py",
+  "SpeechRecognitionRework.py",
+  "SpeechRecognitionReworkedSingleFile.py",
+]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "N", "RET", "SIM"]
