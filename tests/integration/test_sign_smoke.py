@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import pytest
+
 from gorisim.sign_to_text.pipeline import SignToTextPipeline, SignToTextResult
 
 

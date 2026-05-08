@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock
 
 import numpy as np
+
 from gorisim.speech_to_sign.enroll import delete_profile, enroll_user, list_profiles
 
 

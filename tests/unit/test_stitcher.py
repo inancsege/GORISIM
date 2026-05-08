@@ -3,6 +3,7 @@ from pathlib import Path
 
 import imageio_ffmpeg
 import pytest
+
 from gorisim.speech_to_sign.stitcher import stitch_clips
 
 

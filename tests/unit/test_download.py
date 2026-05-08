@@ -1,6 +1,7 @@
 from unittest.mock import patch
 
 import pytest
+
 from gorisim.config import reset_settings_for_test
 from gorisim.download import (
     MANIFEST,

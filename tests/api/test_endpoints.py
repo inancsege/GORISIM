@@ -3,6 +3,7 @@ from unittest.mock import MagicMock
 
 import pytest
 from fastapi.testclient import TestClient
+
 from gorisim.api import app as app_module
 from gorisim.api.deps import get_sign_pipeline, get_speech_pipeline
 from gorisim.sign_to_text.pipeline import Alternative, SignToTextResult
