@@ -1,43 +1,79 @@
 # GORISIM
-This program is a Turkish sign language translator.
 
-The Turkish Sign Language Translator project is an innovative and comprehensive program that combines deep learning, computer vision, and speech processing techniques to bridge the communication gap between the deaf community and the hearing world. By leveraging state-of-the-art technologies, this project aims to provide an intuitive and efficient solution for real-time translation of Turkish sign language gestures into spoken or written language.
+A bidirectional Turkish Sign Language translator.
 
-Using a combination of machine learning algorithms and computer vision techniques, the program analyzes video input of Turkish sign language gestures captured through a camera. The deep learning models trained on large sign language datasets enable the system to recognize and interpret the intricate hand movements, facial expressions, and body postures that form the basis of Turkish sign language.
+- **Sign → Text**: upload a video of someone signing, get the recognized Turkish word.
+- **Speech → Sign**: speak Turkish, get back a stitched-together video of the corresponding signs.
 
-The computer vision component of the project employs advanced techniques such as object detection, pose estimation, and hand tracking to accurately capture and interpret the sign language gestures in real time. By precisely tracking the user's hand movements and mapping them to the corresponding sign language symbols, the system ensures accurate translation and interpretation.
+## Architecture
 
-To enhance the translation capabilities, the project incorporates speech processing algorithms that convert the interpreted sign language gestures into spoken language. The system uses natural language processing techniques to generate human-readable text from the interpreted sign language, enabling users to understand the meaning behind the gestures through audio output. Additionally, the program can also display the translated text on a screen or interface for better comprehension.
+```mermaid
+flowchart LR
+  Browser <--> API[FastAPI]
+  API --> S2T[Sign→Text]
+  API --> Sp2S[Speech→Sign]
+  S2T --> HRNet[HRNet w48]
+  HRNet --> RClassifier[R(2+1)D-18]
+  RClassifier --> CSV1[(SignList CSV)]
+  Sp2S --> Diarize[pyannote 3.1]
+  Diarize --> Verify[speechbrain ECAPA]
+  Verify --> Whisper[faster-whisper]
+  Whisper --> Lemma[zeyrek]
+  Lemma --> CSV2[(SignList CSV)]
+  CSV2 --> Stitch[ffmpeg stitch]
+```
 
-The Turkish Sign Language Translator project aims to be an inclusive and accessible solution that promotes effective communication between individuals who are deaf or hard of hearing and those who are not familiar with sign language. By leveraging cutting-edge technologies, it seeks to empower the deaf community by providing them with a tool to express themselves more easily and effectively in various settings, including educational institutions, public spaces, and everyday conversations.
+## Requirements
 
-The project is open-source and hosted on GitHub to encourage collaboration and further development by the community. It welcomes contributions from researchers, developers, and sign language experts who are passionate about creating inclusive technologies. With ongoing advancements in deep learning, computer vision, and speech processing, the Turkish Sign Language Translator project holds great potential for improving communication accessibility and fostering inclusivity in society.
+- Python 3.11+
+- A free Hugging Face account + token (for `pyannote/speaker-diarization-3.1`)
+- Optional: NVIDIA GPU (CUDA), Apple Silicon (MPS), or CPU
+- ~5-10 GB disk for downloaded models + a clip subset
 
-## Features
+## Setup
 
-- Translates text into Turkish Sign Language gestures.
-- Utilizes computer vision for gesture recognition.
-- Provides real-time translation for interactive communication.
-- Supports a wide range of Turkish vocabulary.
-- Easy-to-use command-line interface.
-
-## Installation
-
-1. Clone the repository:
+```bash
 git clone https://github.com/inancsege/GORISIM.git
-2. Install the required dependencies:
+cd GORISIM
+
+python -m venv .venv
+source .venv/bin/activate   # on Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-4. Download the pre-trained models for gesture recognition. (Provide instructions if necessary)
+pip install -e .
 
-## Usage
+cp .env.example .env
+# edit .env, set HF_TOKEN=hf_...
 
-1. Open a terminal and navigate to the project directory.
+# accept terms at https://huggingface.co/pyannote/speaker-diarization-3.1
+# (one-time, on your HF account, before the next step works)
 
-2. Run the translator:
+python -m gorisim.download
+```
 
-3. Follow the instructions provided by the program to enter the desired text and view the corresponding TSL gestures.
+## Run
 
-4. Point your webcam towards your hand gestures to allow the program to recognize and translate them.
+```bash
+uvicorn gorisim.api.app:app --port 8000
+```
 
-## Demo
-https://youtu.be/EWTQWo2WmIQ
+Open http://localhost:8000.
+
+## Development
+
+```bash
+pip install -e .[dev]
+pre-commit install
+pytest -m "not slow"
+ruff check .
+pyright
+```
+
+## Acknowledgements
+
+- **AUTSL** — Sincan & Keles, *AUTSL: A Large Scale Multi-Modal Turkish Sign Language Dataset*, IEEE Access 2020. https://cvml.ankara.edu.tr/
+- **CVPR21Chal-SLR (SAM-SLR)** — Jiang, Sun, Sajjadi et al., CVPR 2021. https://github.com/jackyjsy/CVPR21Chal-SLR
+- **pyannote.audio**, **speechbrain**, **faster-whisper**, **zeyrek**.
+
+## License
+
+MIT.
