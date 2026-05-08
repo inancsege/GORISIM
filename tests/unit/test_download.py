@@ -12,6 +12,7 @@ from gorisim.download import (
     is_present,
     require_hf_token,
 )
+from gorisim.download import main as download_main
 
 
 def test_manifest_includes_required_assets():
@@ -81,3 +82,58 @@ def test_fetch_hf_repo_calls_snapshot_download(tmp_path, monkeypatch):
         kwargs = mock_dl.call_args.kwargs
         assert kwargs["repo_id"] == "pyannote/speaker-diarization-3.1"
         assert kwargs["token"] == "hf_test"
+
+
+def test_main_skips_present_assets(tmp_path, monkeypatch):
+    monkeypatch.setenv("GORISIM_MODELS_DIR", str(tmp_path / "m"))
+    monkeypatch.setenv("GORISIM_DATA_DIR", str(tmp_path / "d"))
+    monkeypatch.setenv("HF_TOKEN", "hf_test")
+    from gorisim.config import reset_settings_for_test
+    reset_settings_for_test()
+
+    # Create every manifest file as a placeholder so all are "present"
+    from gorisim.download import _build_manifest
+    for asset in _build_manifest():
+        if asset.target.suffix:
+            asset.target.parent.mkdir(parents=True, exist_ok=True)
+            asset.target.write_bytes(b"x")
+        else:
+            asset.target.mkdir(parents=True, exist_ok=True)
+
+    with (
+        patch("gorisim.download.fetch_http") as mock_http,
+        patch("gorisim.download.fetch_hf_repo") as mock_hf,
+        patch("gorisim.download.fetch_hf_whisper_ct2") as mock_ct2,
+    ):
+        rc = download_main()
+        mock_http.assert_not_called()
+        mock_hf.assert_not_called()
+        mock_ct2.assert_not_called()
+    assert rc == 0
+
+
+def test_main_fetches_missing_http_assets(tmp_path, monkeypatch):
+    monkeypatch.setenv("GORISIM_MODELS_DIR", str(tmp_path / "m"))
+    monkeypatch.setenv("GORISIM_DATA_DIR", str(tmp_path / "d"))
+    monkeypatch.setenv("HF_TOKEN", "hf_test")
+    from gorisim.config import reset_settings_for_test
+    reset_settings_for_test()
+
+    # Pre-create all *non*-HTTP assets as present (HF dirs); leave HTTP ones missing.
+    (tmp_path / "m" / "pyannote").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "m" / "speechbrain" / "spkrec-ecapa-voxceleb").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "m" / "faster-whisper").mkdir(parents=True, exist_ok=True)
+    # Leave the 3 HTTP assets (hrnet_wholebody, rgb_final_finetuned, autsl_signlist_csv) MISSING.
+
+    with (
+        patch("gorisim.download.fetch_http") as mock_http,
+        patch("gorisim.download.fetch_hf_repo") as mock_hf,
+        patch("gorisim.download.fetch_hf_whisper_ct2") as mock_ct2,
+    ):
+        rc = download_main()
+    assert rc == 0
+    # Three HTTP assets should have triggered fetch_http
+    assert mock_http.call_count == 3
+    # HF assets are present, so no HF calls
+    mock_hf.assert_not_called()
+    mock_ct2.assert_not_called()

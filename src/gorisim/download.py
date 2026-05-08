@@ -143,8 +143,26 @@ def fetch_hf_whisper_ct2(*, model_size: str, target: Path) -> None:
 
 
 def main() -> int:
-    """CLI entrypoint — implemented in Tasks 6-7."""
-    print("download.py — see Tasks 6-7 for the full implementation", file=sys.stderr)
+    s = get_settings()
+    ensure_dirs(s.models_dir, s.data_dir)
+
+    manifest = _build_manifest()
+    for asset in manifest:
+        if is_present(asset):
+            print(f"[skip] {asset.name} already present")
+            continue
+        print(f"[fetch] {asset.name}")
+        if asset.name == "pyannote_diarization_3_1":
+            fetch_hf_repo(repo_id="pyannote/speaker-diarization-3.1", target=asset.target)
+        elif asset.name == "speechbrain_ecapa":
+            fetch_hf_repo(repo_id="speechbrain/spkrec-ecapa-voxceleb", target=asset.target)
+        elif asset.name == "faster_whisper":
+            fetch_hf_whisper_ct2(model_size=s.whisper_model, target=asset.target)
+        elif asset.url is not None:
+            fetch_http(url=asset.url, target=asset.target)
+        else:
+            raise RuntimeError(f"No fetcher for asset: {asset.name}")
+    print("All assets present.")
     return 0
 
 
