@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<title>GORISIM — Türk İşaret Dili Çevirmeni</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="/static/style.css" />
+</head>
+<body class="bg-slate-50 text-slate-900">
+<div class="max-w-3xl mx-auto p-6">
+  <h1 class="text-3xl font-bold mb-2">GORISIM</h1>
+  <p class="text-slate-600 mb-6">Türk İşaret Dili çevirmeni — iki yönlü</p>
+
+  <div class="flex gap-2 mb-4">
+    <button data-tab="sign" class="tab-btn active px-4 py-2 rounded-md bg-slate-900 text-white">İşaret → Metin</button>
+    <button data-tab="speech" class="tab-btn px-4 py-2 rounded-md bg-slate-200">Konuşma → İşaret</button>
+  </div>
+
+  <section id="tab-sign" class="tab-panel">
+    <div class="bg-white rounded-lg p-4 shadow">
+      <input type="file" id="signFile" accept="video/*" class="block mb-3" />
+      <button id="signBtn" class="px-4 py-2 bg-blue-600 text-white rounded-md">Çevir</button>
+      <div id="signResult" class="mt-4"></div>
+    </div>
+  </section>
+
+  <section id="tab-speech" class="tab-panel hidden">
+    <div class="bg-white rounded-lg p-4 shadow space-y-3">
+      <div>
+        <label class="block text-sm text-slate-600 mb-1">Profil (opsiyonel)</label>
+        <select id="profileSelect" class="border rounded-md p-2 w-full">
+          <option value="">— Yok —</option>
+        </select>
+      </div>
+      <input type="file" id="speechFile" accept="audio/*" />
+      <button id="speechBtn" class="px-4 py-2 bg-blue-600 text-white rounded-md">Çevir</button>
+      <div id="speechResult"></div>
+    </div>
+  </section>
+</div>
+<script src="/static/app.js"></script>
+</body>
+</html>
