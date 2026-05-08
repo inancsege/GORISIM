@@ -1,9 +1,8 @@
 from unittest.mock import patch
 
 import pytest
-from torch import device as _device  # pyright: ignore[reportPrivateImportUsage]
-
 from gorisim.devices import pick_device
+from torch import device as _device  # pyright: ignore[reportPrivateImportUsage]
 
 
 def test_explicit_cpu_override():

@@ -40,4 +40,4 @@ pip install -r requirements.txt
 4. Point your webcam towards your hand gestures to allow the program to recognize and translate them.
 
 ## Demo
-https://youtu.be/EWTQWo2WmIQ 
+https://youtu.be/EWTQWo2WmIQ

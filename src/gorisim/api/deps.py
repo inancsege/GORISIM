@@ -1,4 +1,5 @@
 """FastAPI dependency providers — pipelines are singletons created in lifespan."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass

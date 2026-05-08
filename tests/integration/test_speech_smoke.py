@@ -1,7 +1,6 @@
 from pathlib import Path
 
 import pytest
-
 from gorisim.speech_to_sign.pipeline import SpeechToSignPipeline, SpeechToSignResult
 
 

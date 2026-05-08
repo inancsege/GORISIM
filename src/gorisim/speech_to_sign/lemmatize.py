@@ -1,4 +1,5 @@
 """Turkish lemmatization wrapper — robust against zeyrek IndexError edge cases."""
+
 from __future__ import annotations
 
 import re
@@ -15,6 +16,7 @@ def _get_analyzer() -> MorphAnalyzer:
     global _analyzer
     if _analyzer is None:
         import nltk
+
         try:
             nltk.data.find("tokenizers/punkt_tab")
         except LookupError:

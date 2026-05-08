@@ -1,4 +1,5 @@
 """R(2+1)D-18 sign classifier inference."""
+
 from __future__ import annotations
 
 from collections import OrderedDict
@@ -27,7 +28,7 @@ class SignClassifier:
         ckpt = torch.load(weights_path, map_location="cpu")
         new_sd = OrderedDict()
         for k, v in ckpt.items():
-            new_sd[k[len("module."):] if k.startswith("module.") else k] = v
+            new_sd[k[len("module.") :] if k.startswith("module.") else k] = v
         self.model.load_state_dict(new_sd, strict=False)
         self.model.to(self.device).eval()
 

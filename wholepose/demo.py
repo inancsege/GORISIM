@@ -57,7 +57,7 @@ def merge_hm(hms_list):
     assert isinstance(hms_list, list)
     for hms in hms_list:
         hms[1,:,:,:] = torch.flip(hms[1,index_mirror,:,:], [2])
-    
+
     hm = torch.cat(hms_list, dim=0)
     # print(hm.size(0))
     hm = torch.mean(hms, dim=0)
@@ -101,8 +101,8 @@ def main():
         paths = []
         names = []
         for root, _, fnames in natsorted(os.walk(input_path)):
-            for fname in natsorted(fnames):     
-                path1 = os.path.join(root, fname) 
+            for fname in natsorted(fnames):
+                path1 = os.path.join(root, fname)
                 if 'depth' in fname:
                     continue
                 paths.append(path1)
@@ -135,13 +135,13 @@ def main():
             # frame_width = 256
             # frame_height = 256
             print(path)
-            # output_filename = os.path.join('out_test', names[i]) 
+            # output_filename = os.path.join('out_test', names[i])
 
             # img = Image.open(image_path)
             # fps = cap.get(cv2.CAP_PROP_FPS)
             # writer = cv2.VideoWriter(output_filename,cv2.VideoWriter_fourcc('M','P','4','V'), 5, (frame_width,frame_height))
             output_list = []
-            
+
             while cap.isOpened():
                 success, img = cap.read()
                 if not success:
@@ -154,7 +154,7 @@ def main():
                 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
                 out = []
                 for scale in multi_scales:
-                   
+
                     if scale != 512:
                         img_temp = cv2.resize(img, (scale,scale))
                     else:
@@ -189,7 +189,7 @@ def main():
                 hm = out.cpu().numpy().reshape((133, frame_height//4, frame_height//4))
 
                 pred = pose_process(pred, hm)
-                pred[:,:2] *= 4.0 
+                pred[:,:2] *= 4.0
                 # print(pred.shape)
                 assert pred.shape == (133, 3)
 

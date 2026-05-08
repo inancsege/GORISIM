@@ -4,6 +4,7 @@ Pure PyTorch — no cupy. Handles multi-scale forward + horizontal-flip merge
 following the original CVPR21Chal-SLR pipeline, but with merge_hm fixed
 (original code reduced the wrong tensor).
 """
+
 from __future__ import annotations
 
 from collections import OrderedDict
@@ -21,16 +22,26 @@ from gorisim.sign_to_text.models.pose_hrnet import get_pose_net
 from gorisim.sign_to_text.utils import pose_process
 
 # 133 joint indices used to mirror keypoints across the horizontal flip.
-INDEX_MIRROR = np.concatenate([
-    [1, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14, 17, 16],
-    [21, 22, 23, 18, 19, 20],
-    np.arange(40, 23, -1), np.arange(50, 40, -1),
-    np.arange(51, 55), np.arange(59, 54, -1),
-    [69, 68, 67, 66, 71, 70], [63, 62, 61, 60, 65, 64],
-    np.arange(78, 71, -1), np.arange(83, 78, -1),
-    [88, 87, 86, 85, 84, 91, 90, 89],
-    np.arange(113, 134), np.arange(92, 113),
-]) - 1
+INDEX_MIRROR = (
+    np.concatenate(
+        [
+            [1, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14, 17, 16],
+            [21, 22, 23, 18, 19, 20],
+            np.arange(40, 23, -1),
+            np.arange(50, 40, -1),
+            np.arange(51, 55),
+            np.arange(59, 54, -1),
+            [69, 68, 67, 66, 71, 70],
+            [63, 62, 61, 60, 65, 64],
+            np.arange(78, 71, -1),
+            np.arange(83, 78, -1),
+            [88, 87, 86, 85, 84, 91, 90, 89],
+            np.arange(113, 134),
+            np.arange(92, 113),
+        ]
+    )
+    - 1
+)
 assert INDEX_MIRROR.shape[0] == 133
 
 MULTI_SCALES = (512, 640)
@@ -72,7 +83,9 @@ class PoseExtractor:
         s = get_settings()
         self.device = pick_device(s.device)
         weights_path = weights_path or (s.models_dir / "hrnet_w48_coco_wholebody_384x288.pth")
-        config_yaml = Path(__file__).parent / "models" / "hrnet_config" / "wholebody_w48_384x288.yaml"
+        config_yaml = (
+            Path(__file__).parent / "models" / "hrnet_config" / "wholebody_w48_384x288.yaml"
+        )
         cfg.merge_from_file(str(config_yaml))
         self.model = get_pose_net(cfg, is_train=False)
 
@@ -81,9 +94,9 @@ class PoseExtractor:
         new_sd: OrderedDict[str, torch.Tensor] = OrderedDict()
         for k, v in sd.items():
             if "backbone." in k:
-                new_sd[k[len("backbone."):]] = v
+                new_sd[k[len("backbone.") :]] = v
             elif "keypoint_head." in k:
-                new_sd[k[len("keypoint_head."):]] = v
+                new_sd[k[len("keypoint_head.") :]] = v
             else:
                 new_sd[k] = v
         self.model.load_state_dict(new_sd, strict=False)
@@ -111,7 +124,9 @@ class PoseExtractor:
                     tensor = _norm_to_tensor(stacked).to(self.device)
                     hms = self.model(tensor)
                     if scale != 512:
-                        hms = F.interpolate(hms, (w // 4, h // 4), mode="bilinear", align_corners=False)
+                        hms = F.interpolate(
+                            hms, (w // 4, h // 4), mode="bilinear", align_corners=False
+                        )
                     hms_list.append(hms)
                 merged = merge_hm(hms_list)
                 pred = self._heatmap_to_xy(merged, w, h)

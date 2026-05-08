@@ -1,4 +1,5 @@
 """Whisper-based Turkish ASR via faster-whisper (CTranslate2)."""
+
 from __future__ import annotations
 
 from pathlib import Path

@@ -5,10 +5,19 @@ from gorisim.config import Settings
 
 def test_settings_defaults_when_env_empty(monkeypatch, tmp_path):
     for key in [
-        "HF_TOKEN", "OPENAI_API_KEY", "GORISIM_DEVICE", "GORISIM_DIARIZATION",
-        "GORISIM_USE_LLM", "GORISIM_NO_PROFILE_MODE", "GORISIM_WHISPER_MODEL",
-        "GORISIM_MAX_VIDEO_MB", "GORISIM_MAX_VIDEO_SECONDS", "GORISIM_MAX_AUDIO_MB",
-        "GORISIM_MAX_AUDIO_SECONDS", "GORISIM_MODELS_DIR", "GORISIM_DATA_DIR",
+        "HF_TOKEN",
+        "OPENAI_API_KEY",
+        "GORISIM_DEVICE",
+        "GORISIM_DIARIZATION",
+        "GORISIM_USE_LLM",
+        "GORISIM_NO_PROFILE_MODE",
+        "GORISIM_WHISPER_MODEL",
+        "GORISIM_MAX_VIDEO_MB",
+        "GORISIM_MAX_VIDEO_SECONDS",
+        "GORISIM_MAX_AUDIO_MB",
+        "GORISIM_MAX_AUDIO_SECONDS",
+        "GORISIM_MODELS_DIR",
+        "GORISIM_DATA_DIR",
         "GORISIM_CLIP_TTL_SECONDS",
     ]:
         monkeypatch.delenv(key, raising=False)
@@ -55,5 +64,6 @@ def test_settings_invalid_device_raises(monkeypatch, tmp_path):
 
     import pytest
     from pydantic import ValidationError
+
     with pytest.raises(ValidationError):
         Settings(_env_file=None)  # type: ignore[call-arg]

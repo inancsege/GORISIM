@@ -1,4 +1,5 @@
 """End-to-end Speech → Sign pipeline."""
+
 from __future__ import annotations
 
 import subprocess
@@ -67,6 +68,7 @@ class SpeechToSignPipeline:
         s = get_settings()
         if asr is None:
             from gorisim.speech_to_sign.stt import TurkishASR as _TurkishASR
+
             self.asr: TurkishASR = _TurkishASR()
         else:
             self.asr = asr
@@ -74,6 +76,7 @@ class SpeechToSignPipeline:
             self.diarizer: Diarizer | None = diarizer
         elif s.diarization:
             from gorisim.speech_to_sign.diarize import Diarizer as _Diarizer
+
             self.diarizer = _Diarizer()
         else:
             self.diarizer = None
@@ -81,6 +84,7 @@ class SpeechToSignPipeline:
             self.verifier: SpeakerVerifier | None = verifier
         elif s.diarization:
             from gorisim.speech_to_sign.verify import SpeakerVerifier as _SpeakerVerifier
+
             self.verifier = _SpeakerVerifier()
         else:
             self.verifier = None
@@ -107,6 +111,7 @@ class SpeechToSignPipeline:
             kept = [t for t in turns if t.speaker == kept_speaker]
         else:
             from gorisim.speech_to_sign.enroll import load_profile
+
             assert self.verifier is not None
             embedding = load_profile(profile)
             kept: list[Turn] = []
@@ -161,9 +166,21 @@ class SpeechToSignPipeline:
             # Empty result: emit a 1-frame black mp4 so downstream callers always get a path
             ffmpeg = imageio_ffmpeg.get_ffmpeg_exe()
             subprocess.run(
-                [ffmpeg, "-y", "-f", "lavfi", "-i", "color=c=black:size=64x64:duration=1:rate=24",
-                 "-c:v", "libx264", "-pix_fmt", "yuv420p", str(output_video)],
-                check=True, capture_output=True,
+                [
+                    ffmpeg,
+                    "-y",
+                    "-f",
+                    "lavfi",
+                    "-i",
+                    "color=c=black:size=64x64:duration=1:rate=24",
+                    "-c:v",
+                    "libx264",
+                    "-pix_fmt",
+                    "yuv420p",
+                    str(output_video),
+                ],
+                check=True,
+                capture_output=True,
             )
 
         return SpeechToSignResult(

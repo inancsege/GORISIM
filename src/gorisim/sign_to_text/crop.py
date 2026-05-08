@@ -1,4 +1,5 @@
 """Signer-centered crop computation given full-body keypoints."""
+
 from __future__ import annotations
 
 import cv2
@@ -6,11 +7,14 @@ import numpy as np
 
 # Indices into the 133-keypoint COCO-WholeBody output, preserved from
 # the original CVPR21Chal-SLR pipeline.
-SELECTED_JOINTS = np.concatenate((
-    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-    [91, 95, 96, 99, 100, 103, 104, 107, 108, 111],
-    [112, 116, 117, 120, 121, 124, 125, 128, 129, 132],
-), axis=0)
+SELECTED_JOINTS = np.concatenate(
+    (
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        [91, 95, 96, 99, 100, 103, 104, 107, 108, 111],
+        [112, 116, 117, 120, 121, 124, 125, 128, 129, 132],
+    ),
+    axis=0,
+)
 
 
 def compute_crop_window(
@@ -53,7 +57,7 @@ def crop_frame(
         min(frame_size, (center_crop + radius_crop)[0]),
         min(frame_size, (center_crop + radius_crop)[1]),
     )
-    image = image[rect[1]:rect[3], rect[0]:rect[2], :]
+    image = image[rect[1] : rect[3], rect[0] : rect[2], :]
     h, w = image.shape[:2]
     if h < w:
         top = abs(h - w) // 2

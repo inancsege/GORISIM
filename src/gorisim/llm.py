@@ -1,4 +1,5 @@
 """Optional OpenAI v1+ grammar cleanup. Off by default; pass-through when disabled."""
+
 from __future__ import annotations
 
 from openai import OpenAI

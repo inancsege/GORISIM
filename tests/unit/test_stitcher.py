@@ -3,16 +3,23 @@ from pathlib import Path
 
 import imageio_ffmpeg
 import pytest
-
 from gorisim.speech_to_sign.stitcher import stitch_clips
 
 
 def _make_clip(path: Path, color: tuple[int, int, int], seconds: float = 0.5) -> None:
     ffmpeg = imageio_ffmpeg.get_ffmpeg_exe()
     cmd = [
-        ffmpeg, "-y", "-f", "lavfi", "-i",
+        ffmpeg,
+        "-y",
+        "-f",
+        "lavfi",
+        "-i",
         f"color=c=#{color[0]:02x}{color[1]:02x}{color[2]:02x}:size=64x64:duration={seconds}:rate=24",
-        "-c:v", "libx264", "-pix_fmt", "yuv420p", str(path),
+        "-c:v",
+        "libx264",
+        "-pix_fmt",
+        "yuv420p",
+        str(path),
     ]
     subprocess.run(cmd, check=True, capture_output=True)
 

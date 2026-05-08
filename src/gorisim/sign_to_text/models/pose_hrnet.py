@@ -38,7 +38,7 @@ class BinsBlock(nn.Module):
         self.conv1 = conv3x3(inplanes, planes, stride)
         self.conv1 = nn.Conv2d(inplanes, planes, 3, stride, 1, groups=planes, bias=False),
         self.bn1 = nn.BatchNorm2d(planes, momentum=BN_MOMENTUM)
-        
+
         self.conv2_1 = nn.Conv2d(planes, planes/8, 1, stride, 1, bias=False),
         self.conv2_2 = nn.Conv2d(planes/8, planes, 1, stride, 1, bias=False),
         self.bn2 = nn.BatchNorm2d(planes, momentum=BN_MOMENTUM)

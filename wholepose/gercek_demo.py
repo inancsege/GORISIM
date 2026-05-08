@@ -90,7 +90,7 @@ def merge_hm(hms_list):
     assert isinstance(hms_list, list)
     for hms in hms_list:
         hms[1,:,:,:] = torch.flip(hms[1,index_mirror,:,:], [2])
-    
+
     hm = torch.cat(hms_list, dim=0)
     # print(hm.size(0))
     hm = torch.mean(hms, dim=0)
@@ -133,8 +133,8 @@ with torch.no_grad():
     paths = []
     names = []
     for root, _, fnames in natsorted(os.walk(input_path)):
-        for fname in natsorted(fnames):     
-            path1 = os.path.join(root, fname) 
+        for fname in natsorted(fnames):
+            path1 = os.path.join(root, fname)
             if 'depth' in fname:
                 continue
             paths.append(path1)
@@ -167,13 +167,13 @@ with torch.no_grad():
             # frame_width = 256
             # frame_height = 256
         print(path)
-            # output_filename = os.path.join('out_test', names[i]) 
+            # output_filename = os.path.join('out_test', names[i])
 
             # img = Image.open(image_path)
             # fps = cap.get(cv2.CAP_PROP_FPS)
             # writer = cv2.VideoWriter(output_filename,cv2.VideoWriter_fourcc('M','P','4','V'), 5, (frame_width,frame_height))
         output_list = []
-            
+
         while cap.isOpened():
             success, img = cap.read()
             if not success:
@@ -192,15 +192,15 @@ with torch.no_grad():
             #img.thumbnail((512,512),Image.ANTIALIAS)
             out = []
             for scale in multi_scales:
-                   
+
                 if scale != 512:
                     print("x")
                     img_temp = cv2.resize(img, (scale,scale))
-                    
+
                 else:
-                    
+
                     img_temp = img
-                
+
                 img_temp = stack_flip(img_temp)
                 img_temp = norm_numpy_totensor(img_temp).cuda()
                 print(img_temp.shape)
@@ -263,7 +263,7 @@ def crop(image, center, radius, size=512):
     radius_crop = (radius * scale).astype(np.int32)
     center_crop = (center).astype(np.int32)
 
-    rect = (max(0,(center_crop-radius_crop)[0]), max(0,(center_crop-radius_crop)[1]), 
+    rect = (max(0,(center_crop-radius_crop)[0]), max(0,(center_crop-radius_crop)[1]),
                  min(512,(center_crop+radius_crop)[0]), min(512,(center_crop+radius_crop)[1]))
 
     image = image[rect[1]:rect[3],rect[0]:rect[2],:]
@@ -278,8 +278,8 @@ def crop(image, center, radius, size=512):
         image = cv2.copyMakeBorder(image, 0, 0, left, right, cv2.BORDER_CONSTANT,value=(0,0,0))
     return image
 
-selected_joints = np.concatenate(([0,1,2,3,4,5,6,7,8,9,10], 
-                    [91,95,96,99,100,103,104,107,108,111],[112,116,117,120,121,124,125,128,129,132]), axis=0) 
+selected_joints = np.concatenate(([0,1,2,3,4,5,6,7,8,9,10],
+                    [91,95,96,99,100,103,104,107,108,111],[112,116,117,120,121,124,125,128,129,132]), axis=0)
 folder = 'C:/Users/egear/Desktop/bitirme_test' # 'train', 'test'
 npy_folder = "C:/Users/egear/Desktop/bitirme_npy" # 'train_npy/npy3', 'test_npy/npy3'
 out_folder = "C:/Users/egear/Desktop/bitirme_frames" # 'train_frames' 'test_frames'
@@ -329,19 +329,19 @@ def read_images(folder_path):
        # assert len(os.listdir(folder_path)) >= self.frames, "Too few images in your data folder: " + str(folder_path)
         folder_path = folder_path.replace(os.sep, '/')
         images = []
-      
+
         frame_indices = np.arange(len(os.listdir(folder_path))) + 1
-        
+
          #for i in range(self.frames):
         for i in frame_indices:
-            
+
             #print(folder_path)
             folder = os.path.join(folder_path + "/{:04d}.jpg").format(i)
             image = Image.open(folder)
             #image = Image.open(os.path.join(folder_path, '{:04d}.jpg').format(i))
-            
-           
-            
+
+
+
             crop_box = (16, 16, 240, 240)
             image = image.crop(crop_box)
             # assert image.size[0] == 224
@@ -360,15 +360,15 @@ def read_images(folder_path):
 def preprocess_frame(frame):
     # Resize the frame to a specific size
     frame = cv2.flip(frame, 3)
-    
-    
+
+
     frame = np.array(frame)
     #frame = cv2.resize(frame, (32,32),interpolation=cv2.INTER_LINEAR)
     #frame = frame.astype(np.float32)
     frame = np.float32(frame)
     #frame = cv2.resize(frame, (32,32),interpolation=cv2.INTER_LINEAR)
     # Convert the frame to a numpy array
-    
+
     #frame = np.array(frame)
 
     # Normalize the frame
@@ -377,7 +377,7 @@ def preprocess_frame(frame):
     # Add an additional dimension to the frame (since the model expects a 4D tensor as input)
     #frame = np.expand_dims(frame, axis=0)
     frame = np.expand_dims(frame, axis=0)
-    
+
     return frame
 
 def argmax(x):
@@ -397,7 +397,7 @@ def process_predictions(predictions):
     print(toppredictions)
     print(predicted.item())
 
-    
+
 
 
 # Start capturing the video
@@ -409,26 +409,24 @@ input_tensor = torch.tensor(all_frames)
 
 input_tensor = input_tensor.permute(1,4,0,2,3)
 
-        
+
 input_tensor = input_tensor.to('cuda')
-    
-    
+
+
 predictions = model(input_tensor)
 process_predictions(predictions)
 
 
 
-    
+
 
     #cv2.imshow('Frame', frame)
     #image, results = mediapipe_detection(frame, holistic)
         #print(image)
-        
+
 
         #draw_styled_landmarks(image, results)
 
         #cv2.imshow('OpenCV Feed', image)
 
 cv2.destroyAllWindows()
-
-

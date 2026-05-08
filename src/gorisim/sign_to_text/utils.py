@@ -13,7 +13,7 @@ def pose_process(coords, hms):
     # print(hm_w, ', ', hm_h)
     for p in range(coords.shape[0]):
         hm = hms[p]
-        
+
         px = int(math.floor(coords[p][0] + 0.5))
         py = int(math.floor(coords[p][1] + 0.5))
         # score[p] = hm[py, px]
@@ -37,14 +37,14 @@ def plot_pose(img,result,scale=(1.0,1.0)):
     unshown_pts = [0,1,2,3,4,11,12,13,14,15,16,17,18,19,20,21,22]
     l_pair = [         #v3 web
         #coco pose
-        
+
         (5, 7),# R shoulder - R elbow
         (7, 9),# R elbow - R wrist
-        
+
         (6, 8), # M shoulder - L shoulder
         (8, 10),# L shoulder - L elbow
         (5, 6),# L elbow - L wrist
-        
+
 #====================================
 #=========feet ===================
 
@@ -66,7 +66,7 @@ def plot_pose(img,result,scale=(1.0,1.0)):
         (36,37),
         (37,38),
         (38,39),
-        
+
         (40,41),#R eye brows
         (41,42),
         (42,43),
@@ -75,7 +75,7 @@ def plot_pose(img,result,scale=(1.0,1.0)):
         (46,47),
         (47,48),
         (48,49),
-        
+
         (50,51), #nose
         (51,52),
         (52,53),
@@ -83,7 +83,7 @@ def plot_pose(img,result,scale=(1.0,1.0)):
         (55,56),
         (56,57),
         (57,58),
-        
+
         (59,60),# R eye
         (60,61),
         (61,62),
@@ -96,7 +96,7 @@ def plot_pose(img,result,scale=(1.0,1.0)):
         (68,69),
         (69,70),
         (70,65),
-        
+
         (71,72),#out mouth
         (72,73),
         (73,74),
@@ -109,7 +109,7 @@ def plot_pose(img,result,scale=(1.0,1.0)):
         (80,81),
         (81,82),
         (82,71),
-        
+
         (83,84),#in mouth
         (84,85),
         (85,86),
@@ -141,7 +141,7 @@ def plot_pose(img,result,scale=(1.0,1.0)):
         (108,109),
         (109,110),
         (110,111),
-        
+
         (10,112), # R wrist - R hand
         (112,113),#R thumb
         (113,114),

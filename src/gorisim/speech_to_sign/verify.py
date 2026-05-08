@@ -1,4 +1,5 @@
 """speechbrain ECAPA speaker verification."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -24,7 +25,9 @@ class SpeakerVerifier:
         embedding = self.model.encode_batch(signal.unsqueeze(0))
         return embedding.squeeze().detach().cpu().numpy()
 
-    def matches(self, audio_path: Path, profile_embedding: np.ndarray, *, threshold: float = 0.25) -> bool:
+    def matches(
+        self, audio_path: Path, profile_embedding: np.ndarray, *, threshold: float = 0.25
+    ) -> bool:
         clip_embedding = self.embed(audio_path)
         a = torch.from_numpy(profile_embedding)
         b = torch.from_numpy(clip_embedding)

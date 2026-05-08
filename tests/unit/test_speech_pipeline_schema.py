@@ -15,7 +15,9 @@ def test_result_schema():
     r = SpeechToSignResult(
         transcript="merhaba",
         lemmas=["merhaba"],
-        matched_signs=[MatchedSign(lemma="merhaba", class_id=0, turkish="merhaba", english="hello")],
+        matched_signs=[
+            MatchedSign(lemma="merhaba", class_id=0, turkish="merhaba", english="hello")
+        ],
         missing_words=[],
         output_video_path=Path("/tmp/x.mp4"),
         duration_ms=10,

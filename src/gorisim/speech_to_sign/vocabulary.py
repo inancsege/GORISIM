@@ -1,4 +1,5 @@
 """AUTSL SignList CSV → bidirectional lookup, with Turkish-correct normalization."""
+
 from __future__ import annotations
 
 from pathlib import Path

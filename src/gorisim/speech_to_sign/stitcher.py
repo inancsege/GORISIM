@@ -1,4 +1,5 @@
 """Concatenate sign-language clips into a single mp4 using imageio-ffmpeg."""
+
 from __future__ import annotations
 
 import shlex
@@ -21,18 +22,34 @@ def stitch_clips(clip_paths: list[Path], *, output_path: Path) -> Path:
         list_path = Path(f.name)
     try:
         cmd = [
-            ffmpeg, "-y", "-f", "concat", "-safe", "0",
-            "-i", str(list_path),
-            "-c", "copy",
+            ffmpeg,
+            "-y",
+            "-f",
+            "concat",
+            "-safe",
+            "0",
+            "-i",
+            str(list_path),
+            "-c",
+            "copy",
             str(output_path),
         ]
         subprocess.run(cmd, check=True, capture_output=True)
     except subprocess.CalledProcessError:
         # Re-encode if -c copy fails (codec mismatch)
         cmd_reencode = [
-            ffmpeg, "-y", "-f", "concat", "-safe", "0",
-            "-i", str(list_path),
-            "-c:v", "libx264", "-pix_fmt", "yuv420p",
+            ffmpeg,
+            "-y",
+            "-f",
+            "concat",
+            "-safe",
+            "0",
+            "-i",
+            str(list_path),
+            "-c:v",
+            "libx264",
+            "-pix_fmt",
+            "yuv420p",
             str(output_path),
         ]
         try:

@@ -1,7 +1,6 @@
 from unittest.mock import patch
 
 import pytest
-
 from gorisim.config import reset_settings_for_test
 from gorisim.download import (
     MANIFEST,
@@ -50,12 +49,18 @@ def test_fetch_http_writes_file(tmp_path):
     class FakeResp:
         status_code = 200
         headers = {"content-length": "2048"}
+
         def iter_content(self, chunk_size: int):
             yield from [c for c in chunks if c]
+
         def raise_for_status(self):
             pass
-        def __enter__(self): return self
-        def __exit__(self, *a): pass
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            pass
 
     with patch("requests.get", return_value=FakeResp()) as mock_get:
         fetch_http(url="https://example/x", target=target)
@@ -89,10 +94,12 @@ def test_main_skips_present_assets(tmp_path, monkeypatch):
     monkeypatch.setenv("GORISIM_DATA_DIR", str(tmp_path / "d"))
     monkeypatch.setenv("HF_TOKEN", "hf_test")
     from gorisim.config import reset_settings_for_test
+
     reset_settings_for_test()
 
     # Create every manifest file as a placeholder so all are "present"
     from gorisim.download import _build_manifest
+
     for asset in _build_manifest():
         if asset.target.suffix:
             asset.target.parent.mkdir(parents=True, exist_ok=True)
@@ -117,6 +124,7 @@ def test_main_fetches_missing_http_assets(tmp_path, monkeypatch):
     monkeypatch.setenv("GORISIM_DATA_DIR", str(tmp_path / "d"))
     monkeypatch.setenv("HF_TOKEN", "hf_test")
     from gorisim.config import reset_settings_for_test
+
     reset_settings_for_test()
 
     # Pre-create all *non*-HTTP assets as present (HF dirs); leave HTTP ones missing.

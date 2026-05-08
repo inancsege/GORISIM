@@ -1,4 +1,5 @@
 """FastAPI application — bidirectional translator endpoints."""
+
 from __future__ import annotations
 
 import shutil
@@ -63,14 +64,18 @@ def _check_size(path: Path, max_mb: int) -> None:
     size_mb = path.stat().st_size / (1024 * 1024)
     if size_mb > max_mb:
         path.unlink(missing_ok=True)
-        raise HTTPException(status_code=413, detail=f"File too large ({size_mb:.1f} MB > {max_mb} MB)")
+        raise HTTPException(
+            status_code=413, detail=f"File too large ({size_mb:.1f} MB > {max_mb} MB)"
+        )
 
 
 @app.get("/", response_class=HTMLResponse)
 async def index() -> HTMLResponse:
     index_path = STATIC_DIR / "index.html"
     if not index_path.exists():
-        return HTMLResponse("<html><body><h1>GORISIM</h1><p>UI not built yet (Task 28).</p></body></html>")
+        return HTMLResponse(
+            "<html><body><h1>GORISIM</h1><p>UI not built yet (Task 28).</p></body></html>"
+        )
     return HTMLResponse(index_path.read_text(encoding="utf-8"))
 
 

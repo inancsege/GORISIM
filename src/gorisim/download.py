@@ -1,4 +1,5 @@
 """Bootstrap downloader for all GORISIM weights and data."""
+
 from __future__ import annotations
 
 import hashlib
@@ -114,7 +115,10 @@ def fetch_http(*, url: str, target: Path) -> None:
     with requests.get(url, stream=True, timeout=60) as resp:
         resp.raise_for_status()
         total = int(resp.headers.get("content-length", "0"))
-        with tmp.open("wb") as f, tqdm(total=total, unit="B", unit_scale=True, desc=target.name) as bar:
+        with (
+            tmp.open("wb") as f,
+            tqdm(total=total, unit="B", unit_scale=True, desc=target.name) as bar,
+        ):
             for chunk in resp.iter_content(chunk_size=1 << 20):
                 if not chunk:
                     continue

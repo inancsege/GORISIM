@@ -1,4 +1,5 @@
 """Voice profile enrollment: average ECAPA embeddings across reference clips."""
+
 from __future__ import annotations
 
 import re

@@ -1,5 +1,4 @@
 import numpy as np
-
 from gorisim.sign_to_text.crop import SELECTED_JOINTS, compute_crop_window
 
 
