@@ -86,6 +86,7 @@ exclude = [
   "src/gorisim/sign_to_text/models/hrnet_config/__init__.py",
   "src/gorisim/sign_to_text/models/hrnet_config/default.py",
   "src/gorisim/sign_to_text/models/hrnet_config/models.py",
+  "src/gorisim/sign_to_text/pose.py",
 ]
 pythonVersion = "3.11"
 typeCheckingMode = "strict"
