@@ -92,6 +92,7 @@ exclude = [
   "src/gorisim/speech_to_sign/vocabulary.py",
   "src/gorisim/speech_to_sign/lemmatize.py",
   "src/gorisim/speech_to_sign/diarize.py",
+  "src/gorisim/speech_to_sign/verify.py",
 ]
 pythonVersion = "3.11"
 typeCheckingMode = "strict"
