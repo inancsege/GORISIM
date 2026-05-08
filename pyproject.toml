@@ -65,12 +65,6 @@ extend-exclude = [
   "src/gorisim/sign_to_text/models/resnet2plus1d.py",
   "src/gorisim/sign_to_text/utils.py",
   "src/gorisim/sign_to_text/models/hrnet_config",
-  "wholepose",
-  "SpeakerVerification.py",
-  "SpeechRecogniitonOptimized.py",
-  "SpeechRecognition.py",
-  "SpeechRecognitionRework.py",
-  "SpeechRecognitionReworkedSingleFile.py",
 ]
 
 [tool.ruff.lint]
