@@ -5,6 +5,8 @@ import re
 
 from zeyrek import MorphAnalyzer
 
+from gorisim.speech_to_sign.vocabulary import normalize_turkish
+
 _analyzer: MorphAnalyzer | None = None
 _TOKEN_RE = re.compile(r"\b[\wçğıöşüÇĞİÖŞÜ]+\b", flags=re.UNICODE)
 
@@ -12,6 +14,11 @@ _TOKEN_RE = re.compile(r"\b[\wçğıöşüÇĞİÖŞÜ]+\b", flags=re.UNICODE)
 def _get_analyzer() -> MorphAnalyzer:
     global _analyzer
     if _analyzer is None:
+        import nltk
+        try:
+            nltk.data.find("tokenizers/punkt_tab")
+        except LookupError:
+            nltk.download("punkt_tab", quiet=True)
         _analyzer = MorphAnalyzer()
     return _analyzer
 
@@ -27,7 +34,7 @@ def extract_stems(text: str) -> list[str]:
     analyzer = _get_analyzer()
     out: list[str] = []
     for token in _TOKEN_RE.findall(text):
-        lowered = token.replace("İ", "i").replace("I", "ı").casefold()
+        lowered = normalize_turkish(token)
         try:
             parses = analyzer.analyze(lowered)
         except Exception:
