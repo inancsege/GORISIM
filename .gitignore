@@ -1,1 +1,26 @@
 docs/
+.env
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# Model weights and data — downloaded via gorisim-download
+models/
+data/sign_clips/
+data/profiles/
+
+# Output mp4s served by /clips/{id}.mp4
+.cache/
+output/
+
+# IDE
+.vscode/
+.idea/
+.DS_Store
