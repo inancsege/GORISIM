@@ -40,8 +40,16 @@ from gorisim.speech_to_sign.verify import SpeakerVerifier
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     reg = get_registry()
-    reg.sign = SignToTextPipeline.load()
-    reg.speech = SpeechToSignPipeline.load()
+    try:
+        reg.sign = SignToTextPipeline.load()
+    except Exception as e:  # noqa: BLE001 — degrade gracefully if weights missing
+        print(f"[lifespan] sign pipeline unavailable: {e}")
+        reg.sign = None
+    try:
+        reg.speech = SpeechToSignPipeline.load()
+    except Exception as e:  # noqa: BLE001
+        print(f"[lifespan] speech pipeline unavailable: {e}")
+        reg.speech = None
     yield
     reg.sign = None
     reg.speech = None

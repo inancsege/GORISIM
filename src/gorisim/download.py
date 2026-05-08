@@ -151,21 +151,36 @@ def main() -> int:
     ensure_dirs(s.models_dir, s.data_dir)
 
     manifest = _build_manifest()
+    failed: list[tuple[str, str]] = []
     for asset in manifest:
         if is_present(asset):
             print(f"[skip] {asset.name} already present")
             continue
         print(f"[fetch] {asset.name}")
-        if asset.name == "pyannote_diarization_3_1":
-            fetch_hf_repo(repo_id="pyannote/speaker-diarization-3.1", target=asset.target)
-        elif asset.name == "speechbrain_ecapa":
-            fetch_hf_repo(repo_id="speechbrain/spkrec-ecapa-voxceleb", target=asset.target)
-        elif asset.name == "faster_whisper":
-            fetch_hf_whisper_ct2(model_size=s.whisper_model, target=asset.target)
-        elif asset.url is not None:
-            fetch_http(url=asset.url, target=asset.target)
-        else:
-            raise RuntimeError(f"No fetcher for asset: {asset.name}")
+        try:
+            if asset.name == "pyannote_diarization_3_1":
+                fetch_hf_repo(repo_id="pyannote/speaker-diarization-3.1", target=asset.target)
+            elif asset.name == "speechbrain_ecapa":
+                fetch_hf_repo(repo_id="speechbrain/spkrec-ecapa-voxceleb", target=asset.target)
+            elif asset.name == "faster_whisper":
+                fetch_hf_whisper_ct2(model_size=s.whisper_model, target=asset.target)
+            elif asset.url is not None:
+                fetch_http(url=asset.url, target=asset.target)
+            else:
+                raise RuntimeError(f"No fetcher for asset: {asset.name}")
+        except Exception as e:  # noqa: BLE001 — keep going past one bad asset
+            print(f"[warn] {asset.name} failed: {e}", file=sys.stderr)
+            failed.append((asset.name, str(e)))
+    if failed:
+        print(f"\n{len(failed)} asset(s) could not be fetched automatically:", file=sys.stderr)
+        for name, err in failed:
+            print(f"  - {name}: {err}", file=sys.stderr)
+        print(
+            "\nSome features may be unavailable until these are placed manually under "
+            f"{s.models_dir}/. See README for instructions.",
+            file=sys.stderr,
+        )
+        return 1
     print("All assets present.")
     return 0
 

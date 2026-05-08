@@ -69,8 +69,9 @@ def test_fetch_http_writes_file(tmp_path):
     assert target.read_bytes() == b"a" * 1024 + b"b" * 1024
 
 
-def test_require_hf_token_raises_when_missing(monkeypatch):
+def test_require_hf_token_raises_when_missing(monkeypatch, tmp_path):
     monkeypatch.delenv("HF_TOKEN", raising=False)
+    monkeypatch.chdir(tmp_path)  # ignore any .env in the real cwd
     reset_settings_for_test()
     with pytest.raises(SystemExit):
         require_hf_token()
