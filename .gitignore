@@ -12,7 +12,7 @@ build/
 *.egg-info/
 
 # Model weights and data — downloaded via gorisim-download
-models/
+/models/
 data/sign_clips/
 data/profiles/
 

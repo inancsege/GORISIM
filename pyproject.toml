@@ -67,6 +67,14 @@ ignore = ["E501"]
 
 [tool.pyright]
 include = ["src/gorisim"]
+exclude = [
+  "src/gorisim/sign_to_text/models/pose_hrnet.py",
+  "src/gorisim/sign_to_text/models/resnet2plus1d.py",
+  "src/gorisim/sign_to_text/utils.py",
+  "src/gorisim/sign_to_text/models/hrnet_config/__init__.py",
+  "src/gorisim/sign_to_text/models/hrnet_config/default.py",
+  "src/gorisim/sign_to_text/models/hrnet_config/models.py",
+]
 pythonVersion = "3.11"
 typeCheckingMode = "strict"
 reportMissingTypeStubs = false
