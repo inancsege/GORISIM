@@ -19,3 +19,4 @@ pydantic-settings>=2.2
 huggingface-hub>=0.22
 openai>=1.14
 tqdm>=4.66
+requests>=2.31

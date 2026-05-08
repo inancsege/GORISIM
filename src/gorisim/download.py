@@ -6,6 +6,10 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
+import requests
+from huggingface_hub import snapshot_download  # pyright: ignore[reportUnknownVariableType]
+from tqdm import tqdm
+
 from gorisim.config import get_settings
 
 
@@ -88,6 +92,54 @@ def _build_manifest() -> list[Asset]:
 
 
 MANIFEST = _build_manifest()
+
+
+def require_hf_token() -> str:
+    s = get_settings()
+    if not s.hf_token:
+        print(
+            "ERROR: HF_TOKEN is not set.\n"
+            "1. Create a token at https://huggingface.co/settings/tokens\n"
+            "2. Accept terms at https://huggingface.co/pyannote/speaker-diarization-3.1\n"
+            "3. Put it in your .env file: HF_TOKEN=hf_...",
+            file=sys.stderr,
+        )
+        raise SystemExit(2)
+    return s.hf_token
+
+
+def fetch_http(*, url: str, target: Path) -> None:
+    target.parent.mkdir(parents=True, exist_ok=True)
+    tmp = target.with_suffix(target.suffix + ".part")
+    with requests.get(url, stream=True, timeout=60) as resp:
+        resp.raise_for_status()
+        total = int(resp.headers.get("content-length", "0"))
+        with tmp.open("wb") as f, tqdm(total=total, unit="B", unit_scale=True, desc=target.name) as bar:
+            for chunk in resp.iter_content(chunk_size=1 << 20):
+                if not chunk:
+                    continue
+                f.write(chunk)
+                bar.update(len(chunk))
+    tmp.replace(target)
+
+
+def fetch_hf_repo(*, repo_id: str, target: Path, allow_patterns: list[str] | None = None) -> None:
+    token = require_hf_token()
+    target.mkdir(parents=True, exist_ok=True)
+    snapshot_download(
+        repo_id=repo_id,
+        local_dir=str(target),
+        token=token,
+        allow_patterns=allow_patterns,
+    )
+
+
+def fetch_hf_whisper_ct2(*, model_size: str, target: Path) -> None:
+    """faster-whisper model published by Systran/community as CTranslate2 repos."""
+    token = require_hf_token()
+    repo_id = f"Systran/faster-whisper-{model_size}"
+    target.mkdir(parents=True, exist_ok=True)
+    snapshot_download(repo_id=repo_id, local_dir=str(target), token=token)
 
 
 def main() -> int:
