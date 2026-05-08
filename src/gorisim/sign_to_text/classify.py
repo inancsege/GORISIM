@@ -43,7 +43,7 @@ class SignClassifier:
             arr = np.float32(pil)
             arr = cv2.resize(arr, INPUT_SIZE, interpolation=cv2.INTER_AREA)
             arr = arr / 255.0
-            prepared.append(arr[np.newaxis, ...])
+            prepared.append(arr)
         # (1, T, H, W, 3) -> (1, 3, T, H, W)
         x = torch.from_numpy(np.stack(prepared, axis=0)).unsqueeze(0)
         x = x.permute(0, 4, 1, 2, 3).to(self.device)
