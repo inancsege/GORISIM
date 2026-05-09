@@ -33,9 +33,17 @@
       <div class="brand-sub">Turkish Sign Language Translator</div>
     </div>
   </div>
-  <div class="health-pill" id="healthPill">
-    <span class="health-dot"></span>
-    <span id="healthText">checking…</span>
+  <div class="header-right">
+    <button class="icon-btn" id="historyToggle" title="History (H)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    </button>
+    <button class="icon-btn" id="settingsBtn" title="Voice profiles (P)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    </button>
+    <div class="health-pill" id="healthPill">
+      <span class="health-dot"></span>
+      <span id="healthText">checking…</span>
+    </div>
   </div>
 </header>
 
@@ -64,6 +72,7 @@
           <h2>Upload sign-language video</h2>
           <p class="muted">Drop a clip or click to browse. Best results with full upper-body framing.</p>
         </div>
+        <div class="kbd-hint">⌘ + Enter to translate</div>
       </div>
 
       <div id="signDrop" class="drop">
@@ -100,14 +109,16 @@
           <h2>Speak or upload Turkish audio</h2>
           <p class="muted">Whisper transcribes → zeyrek lemmatizes → AUTSL signs are stitched into a video.</p>
         </div>
+        <div class="kbd-hint">⌘ + Enter to translate</div>
       </div>
 
       <div class="row">
         <label class="field">
           <span class="field-label">Voice profile (optional)</span>
-          <select id="profileSelect" class="select">
-            <option value="">— None —</option>
-          </select>
+          <div class="profile-row">
+            <select id="profileSelect" class="select"><option value="">— None —</option></select>
+            <button class="btn btn-ghost small" id="manageProfilesBtn" type="button">Manage</button>
+          </div>
         </label>
       </div>
 
@@ -115,6 +126,7 @@
         <button id="recordBtn" class="record">
           <span class="record-circle"><span class="record-dot"></span></span>
           <span class="record-text">Record from microphone</span>
+          <span class="record-timer hidden" id="recordTimer">0:00</span>
         </button>
 
         <div class="or">or</div>
@@ -141,6 +153,65 @@
     </div>
   </section>
 </main>
+
+<!-- History drawer -->
+<aside class="drawer" id="historyDrawer">
+  <div class="drawer-head">
+    <h3>Translation history</h3>
+    <button class="icon-btn" id="historyClose" title="Close">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="drawer-body" id="historyBody">
+    <div class="muted center">No history yet — translations you make appear here.</div>
+  </div>
+  <div class="drawer-foot">
+    <button class="btn btn-ghost small" id="historyClear">Clear all</button>
+  </div>
+</aside>
+
+<!-- Profile management modal -->
+<div class="modal-backdrop hidden" id="profileModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Voice profiles</h3>
+      <button class="icon-btn" id="profileModalClose">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p class="muted">A profile pins the speech pipeline to your voice. Record 3 short samples (2-4s each) to enroll.</p>
+      <div class="row">
+        <label class="field">
+          <span class="field-label">Profile name</span>
+          <input id="profileName" class="select" placeholder="ege" />
+        </label>
+      </div>
+      <div class="enroll-grid" id="enrollGrid">
+        <button class="enroll-slot" data-slot="0">
+          <span class="enroll-num">1</span>
+          <span class="enroll-status">Click to record</span>
+        </button>
+        <button class="enroll-slot" data-slot="1">
+          <span class="enroll-num">2</span>
+          <span class="enroll-status">Click to record</span>
+        </button>
+        <button class="enroll-slot" data-slot="2">
+          <span class="enroll-num">3</span>
+          <span class="enroll-status">Click to record</span>
+        </button>
+      </div>
+      <div class="actions" style="margin-top: 16px;">
+        <button class="btn btn-primary" id="enrollSubmit" disabled>Enroll</button>
+      </div>
+      <hr class="hr"/>
+      <h4 class="section-title">Existing profiles</h4>
+      <div id="profileList"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
 
 <footer class="footer">
   <span>Apple MPS · pyannote 3.1 · Whisper-large-v3-turbo · HRNet w48 · R(2+1)D-18</span>
