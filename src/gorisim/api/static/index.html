@@ -4,41 +4,148 @@
 <meta charset="utf-8" />
 <title>GORISIM — Türk İşaret Dili Çevirmeni</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/static/style.css" />
 </head>
-<body class="bg-slate-50 text-slate-900">
-<div class="max-w-3xl mx-auto p-6">
-  <h1 class="text-3xl font-bold mb-2">GORISIM</h1>
-  <p class="text-slate-600 mb-6">Türk İşaret Dili çevirmeni — iki yönlü</p>
+<body>
 
-  <div class="flex gap-2 mb-4">
-    <button data-tab="sign" class="tab-btn active px-4 py-2 rounded-md bg-slate-900 text-white">İşaret → Metin</button>
-    <button data-tab="speech" class="tab-btn px-4 py-2 rounded-md bg-slate-200">Konuşma → İşaret</button>
+<div class="bg-orb orb-1"></div>
+<div class="bg-orb orb-2"></div>
+<div class="bg-orb orb-3"></div>
+<div class="bg-grid"></div>
+
+<header class="header">
+  <div class="brand">
+    <svg class="brand-mark" width="32" height="32" viewBox="0 0 32 32" fill="none">
+      <defs>
+        <linearGradient id="g1" x1="0" y1="0" x2="32" y2="32">
+          <stop offset="0%" stop-color="#8b5cf6"/>
+          <stop offset="100%" stop-color="#06b6d4"/>
+        </linearGradient>
+      </defs>
+      <path d="M6 10 L16 4 L26 10 L26 22 L16 28 L6 22 Z" stroke="url(#g1)" stroke-width="2" fill="none"/>
+      <circle cx="16" cy="16" r="4" fill="url(#g1)"/>
+    </svg>
+    <div>
+      <div class="brand-title">GORISIM</div>
+      <div class="brand-sub">Turkish Sign Language Translator</div>
+    </div>
   </div>
+  <div class="health-pill" id="healthPill">
+    <span class="health-dot"></span>
+    <span id="healthText">checking…</span>
+  </div>
+</header>
 
-  <section id="tab-sign" class="tab-panel">
-    <div class="bg-white rounded-lg p-4 shadow">
-      <input type="file" id="signFile" accept="video/*" class="block mb-3" />
-      <button id="signBtn" class="px-4 py-2 bg-blue-600 text-white rounded-md">Çevir</button>
-      <div id="signResult" class="mt-4"></div>
-    </div>
+<main class="container">
+
+  <section class="hero">
+    <h1>Bidirectional <span class="grad">Turkish Sign Language</span> Translator</h1>
+    <p class="hero-sub">Real-time AI-powered translation between sign language video and Turkish speech.</p>
   </section>
 
-  <section id="tab-speech" class="tab-panel hidden">
-    <div class="bg-white rounded-lg p-4 shadow space-y-3">
-      <div>
-        <label class="block text-sm text-slate-600 mb-1">Profil (opsiyonel)</label>
-        <select id="profileSelect" class="border rounded-md p-2 w-full">
-          <option value="">— Yok —</option>
-        </select>
+  <nav class="tabs">
+    <button data-tab="sign" class="tab active">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+      <span>Sign → Text</span>
+    </button>
+    <button data-tab="speech" class="tab">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      <span>Speech → Sign</span>
+    </button>
+  </nav>
+
+  <section id="tab-sign" class="panel">
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>Upload sign-language video</h2>
+          <p class="muted">Drop a clip or click to browse. Best results with full upper-body framing.</p>
+        </div>
       </div>
-      <input type="file" id="speechFile" accept="audio/*" />
-      <button id="speechBtn" class="px-4 py-2 bg-blue-600 text-white rounded-md">Çevir</button>
-      <div id="speechResult"></div>
+
+      <div id="signDrop" class="drop">
+        <input type="file" id="signFile" accept="video/*" hidden />
+        <div class="drop-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+        </div>
+        <div class="drop-title" id="signDropTitle">Drag a video here</div>
+        <div class="drop-sub">or <span class="link">browse files</span> · mp4, mov, avi, webm</div>
+      </div>
+
+      <video id="signPreview" class="preview hidden" controls muted></video>
+
+      <div class="actions">
+        <button id="signBtn" class="btn btn-primary" disabled>
+          <span class="btn-label">Translate</span>
+          <svg class="btn-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+        <button id="signClear" class="btn btn-ghost hidden">Clear</button>
+      </div>
+
+      <div id="signResult" class="result"></div>
     </div>
   </section>
-</div>
+
+  <section id="tab-speech" class="panel hidden">
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>Speak or upload Turkish audio</h2>
+          <p class="muted">Whisper transcribes → zeyrek lemmatizes → AUTSL signs are stitched into a video.</p>
+        </div>
+      </div>
+
+      <div class="row">
+        <label class="field">
+          <span class="field-label">Voice profile (optional)</span>
+          <select id="profileSelect" class="select">
+            <option value="">— None —</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="audio-modes">
+        <button id="recordBtn" class="record">
+          <span class="record-circle"><span class="record-dot"></span></span>
+          <span class="record-text">Record from microphone</span>
+        </button>
+
+        <div class="or">or</div>
+
+        <div id="speechDrop" class="drop drop-compact">
+          <input type="file" id="speechFile" accept="audio/*" hidden />
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+          <div class="drop-title small" id="speechDropTitle">Upload audio file</div>
+          <div class="drop-sub small">wav, mp3, m4a</div>
+        </div>
+      </div>
+
+      <audio id="speechPreview" class="preview hidden" controls></audio>
+
+      <div class="actions">
+        <button id="speechBtn" class="btn btn-primary" disabled>
+          <span class="btn-label">Translate to Sign</span>
+          <svg class="btn-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+        <button id="speechClear" class="btn btn-ghost hidden">Clear</button>
+      </div>
+
+      <div id="speechResult" class="result"></div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <span>Apple MPS · pyannote 3.1 · Whisper-large-v3-turbo · HRNet w48 · R(2+1)D-18</span>
+</footer>
+
 <script src="/static/app.js"></script>
 </body>
 </html>
