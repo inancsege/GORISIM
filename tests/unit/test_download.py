@@ -1,3 +1,4 @@
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -7,6 +8,7 @@ from gorisim.download import (
     MANIFEST,
     Asset,
     ensure_dirs,
+    fetch_gdrive_zip_extract,
     fetch_hf_repo,
     fetch_http,
     is_present,
@@ -113,15 +115,17 @@ def test_main_skips_present_assets(tmp_path, monkeypatch):
         patch("gorisim.download.fetch_http") as mock_http,
         patch("gorisim.download.fetch_hf_repo") as mock_hf,
         patch("gorisim.download.fetch_hf_whisper_ct2") as mock_ct2,
+        patch("gorisim.download.fetch_gdrive_zip_extract") as mock_gd,
     ):
         rc = download_main()
         mock_http.assert_not_called()
         mock_hf.assert_not_called()
         mock_ct2.assert_not_called()
+        mock_gd.assert_not_called()
     assert rc == 0
 
 
-def test_main_fetches_missing_http_assets(tmp_path, monkeypatch):
+def test_main_fetches_missing_assets_by_correct_fetcher(tmp_path, monkeypatch):
     monkeypatch.setenv("GORISIM_MODELS_DIR", str(tmp_path / "m"))
     monkeypatch.setenv("GORISIM_DATA_DIR", str(tmp_path / "d"))
     monkeypatch.setenv("HF_TOKEN", "hf_test")
@@ -129,21 +133,50 @@ def test_main_fetches_missing_http_assets(tmp_path, monkeypatch):
 
     reset_settings_for_test()
 
-    # Pre-create all *non*-HTTP assets as present (HF dirs); leave HTTP ones missing.
+    # Pre-create the HF dirs as present; leave HTTP and gdrive assets missing.
     (tmp_path / "m" / "pyannote").mkdir(parents=True, exist_ok=True)
     (tmp_path / "m" / "speechbrain" / "spkrec-ecapa-voxceleb").mkdir(parents=True, exist_ok=True)
     (tmp_path / "m" / "faster-whisper").mkdir(parents=True, exist_ok=True)
-    # Leave the 3 HTTP assets (hrnet_wholebody, rgb_final_finetuned, autsl_signlist_csv) MISSING.
+    # Missing: hrnet_wholebody, rgb_final_finetuned (gdrive), autsl_signlist_csv
 
     with (
         patch("gorisim.download.fetch_http") as mock_http,
         patch("gorisim.download.fetch_hf_repo") as mock_hf,
         patch("gorisim.download.fetch_hf_whisper_ct2") as mock_ct2,
+        patch("gorisim.download.fetch_gdrive_zip_extract") as mock_gd,
     ):
         rc = download_main()
     assert rc == 0
-    # Three HTTP assets should have triggered fetch_http
-    assert mock_http.call_count == 3
-    # HF assets are present, so no HF calls
+    # 2 HTTP fetches: hrnet_wholebody + autsl_signlist_csv
+    assert mock_http.call_count == 2
+    # 1 gdrive fetch: rgb_final_finetuned
+    assert mock_gd.call_count == 1
+    assert mock_gd.call_args.kwargs["file_id"] == "1BZiwBm6W00aezXaqzgy0_Sf8B3fd-Zrj"
+    # HF assets present, no HF calls
     mock_hf.assert_not_called()
     mock_ct2.assert_not_called()
+
+
+def test_fetch_gdrive_zip_extract_writes_member(tmp_path):
+    import zipfile
+
+    # Build a real zip on disk that gdown.download will "produce".
+    zip_path = tmp_path / "fake.zip"
+    member = "outer/inner.bin"
+    payload = b"hello-world-" * 1000
+    with zipfile.ZipFile(zip_path, "w") as zf:
+        zf.writestr(member, payload)
+
+    target = tmp_path / "extracted.bin"
+
+    def fake_download(url: str, output: str, quiet: bool = False) -> str:  # noqa: ARG001
+        # Simulate gdown by copying our pre-built zip into the temp location it asked for.
+        Path(output).write_bytes(zip_path.read_bytes())
+        return output
+
+    with patch("gdown.download", side_effect=fake_download) as mock_dl:
+        fetch_gdrive_zip_extract(file_id="ABC123", member=member, target=target)
+        mock_dl.assert_called_once()
+        url_arg = mock_dl.call_args.args[0]
+        assert "ABC123" in url_arg
+    assert target.read_bytes() == payload

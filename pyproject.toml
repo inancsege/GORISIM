@@ -33,6 +33,7 @@ dependencies = [
   "huggingface-hub>=0.22",
   "openai>=1.14",
   "tqdm>=4.66",
+  "gdown>=5.0",
 ]
 
 [project.optional-dependencies]

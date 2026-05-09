@@ -61,8 +61,9 @@ def _build_manifest() -> list[Asset]:
         Asset(
             name="rgb_final_finetuned",
             target=m / "rgb_final_finetuned.pth",
-            # Hosted by jackyjsy/CVPR21Chal-SLR — exact URL filled in download_url_resolver
-            url="https://github.com/jackyjsy/CVPR21Chal-SLR/releases/download/v1.0/rgb_final_finetuned.pth",
+            # Inside Conv3D/final_models_finetuned.zip in the CVPR21Chal-SLR pretrained
+            # Google Drive folder. We use gdown to fetch by file ID and extract.
+            url=None,
             sha256=None,
         ),
         Asset(
@@ -86,7 +87,8 @@ def _build_manifest() -> list[Asset]:
         Asset(
             name="autsl_signlist_csv",
             target=d / "SignList_ClassId_TR_EN.csv",
-            url="https://raw.githubusercontent.com/jackyjsy/data-prepare/main/SignList_ClassId_TR_EN.csv",
+            # Mirror in marcm07/SLR_STGCN — 227 lines (1 header + 226 classes)
+            url="https://raw.githubusercontent.com/marcm07/SLR_STGCN/master/SignList_ClassId_TR_EN.csv",
             sha256=None,
         ),
     ]
@@ -139,11 +141,42 @@ def fetch_hf_repo(*, repo_id: str, target: Path, allow_patterns: list[str] | Non
 
 
 def fetch_hf_whisper_ct2(*, model_size: str, target: Path) -> None:
-    """faster-whisper model published by Systran/community as CTranslate2 repos."""
+    """faster-whisper model. Systran hosts most variants;
+    `large-v3-turbo` lives at mobiuslabsgmbh/faster-whisper-large-v3-turbo."""
     token = require_hf_token()
-    repo_id = f"Systran/faster-whisper-{model_size}"
+    if model_size == "large-v3-turbo":
+        repo_id = "mobiuslabsgmbh/faster-whisper-large-v3-turbo"
+    else:
+        repo_id = f"Systran/faster-whisper-{model_size}"
     target.mkdir(parents=True, exist_ok=True)
     snapshot_download(repo_id=repo_id, local_dir=str(target), token=token)
+
+
+def fetch_gdrive_zip_extract(*, file_id: str, member: str, target: Path) -> None:
+    """Download a zip file from Google Drive by file ID and extract one member.
+
+    Used for assets gated behind Drive folder shares (no direct URL).
+    """
+    import tempfile
+    import zipfile
+
+    import gdown  # pyright: ignore[reportMissingImports, reportMissingTypeStubs]
+
+    target.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory() as tmpdir:
+        zip_path = Path(tmpdir) / "download.zip"
+        url = f"https://drive.google.com/uc?id={file_id}"
+        gdown.download(url, str(zip_path), quiet=False)  # pyright: ignore[reportUnknownMemberType]
+        with (
+            zipfile.ZipFile(zip_path) as zf,
+            zf.open(member) as src,
+            target.open("wb") as dst,
+        ):
+            while True:
+                chunk = src.read(1 << 20)
+                if not chunk:
+                    break
+                dst.write(chunk)
 
 
 def main() -> int:
@@ -164,6 +197,14 @@ def main() -> int:
                 fetch_hf_repo(repo_id="speechbrain/spkrec-ecapa-voxceleb", target=asset.target)
             elif asset.name == "faster_whisper":
                 fetch_hf_whisper_ct2(model_size=s.whisper_model, target=asset.target)
+            elif asset.name == "rgb_final_finetuned":
+                # Conv3D/final_models_finetuned.zip in CVPR21Chal-SLR's public Drive folder
+                # (parent: 1VcbTfnRa95XYxRB6JPdTiHvIzipqQeW3); extract just rgb_final_finetuned.pth.
+                fetch_gdrive_zip_extract(
+                    file_id="1BZiwBm6W00aezXaqzgy0_Sf8B3fd-Zrj",
+                    member="final_models_finetuned/rgb_final_finetuned.pth",
+                    target=asset.target,
+                )
             elif asset.url is not None:
                 fetch_http(url=asset.url, target=asset.target)
             else:

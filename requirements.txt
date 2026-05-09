@@ -20,3 +20,4 @@ huggingface-hub>=0.22
 openai>=1.14
 tqdm>=4.66
 requests>=2.31
+gdown>=5.0
