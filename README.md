@@ -9,18 +9,18 @@ A bidirectional Turkish Sign Language translator.
 
 ```mermaid
 flowchart LR
-  Browser <--> API[FastAPI]
-  API --> S2T[Sign→Text]
-  API --> Sp2S[Speech→Sign]
-  S2T --> HRNet[HRNet w48]
-  HRNet --> RClassifier[R(2+1)D-18]
-  RClassifier --> CSV1[(SignList CSV)]
-  Sp2S --> Diarize[pyannote 3.1]
-  Diarize --> Verify[speechbrain ECAPA]
-  Verify --> Whisper[faster-whisper]
-  Whisper --> Lemma[zeyrek]
-  Lemma --> CSV2[(SignList CSV)]
-  CSV2 --> Stitch[ffmpeg stitch]
+  Browser <--> API["FastAPI"]
+  API --> S2T["Sign → Text"]
+  API --> Sp2S["Speech → Sign"]
+  S2T --> HRNet["HRNet w48"]
+  HRNet --> RClassifier["R(2+1)D-18"]
+  RClassifier --> CSV1[("SignList CSV")]
+  Sp2S --> Diarize["pyannote 3.1"]
+  Diarize --> Verify["speechbrain ECAPA"]
+  Verify --> Whisper["faster-whisper"]
+  Whisper --> Lemma["zeyrek"]
+  Lemma --> CSV2[("SignList CSV")]
+  CSV2 --> Stitch["ffmpeg stitch"]
 ```
 
 ## Requirements
