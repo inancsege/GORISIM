@@ -44,3 +44,15 @@ def test_label_lookup_by_id(vocab):
 
 def test_label_lookup_unknown_id_returns_class_n(vocab):
     assert vocab.label(999) == "class_999"
+
+
+def test_lookup_diacritic_fold_fallback(tmp_path):
+    """If the CSV stores ASCII-folded labels, queries with full Turkish diacritics
+    should still match via the diacritic-fold fallback."""
+    csv_path = tmp_path / "ascii.csv"
+    csv_path.write_text("ClassId,TR,EN\n86,hayir,no\n136,nasil,how\n", encoding="utf-8")
+    v = Vocabulary.load(csv_path)
+    assert v.lookup("hayır") == 86
+    assert v.lookup("nasıl") == 136
+    # Strict path still works for ASCII queries.
+    assert v.lookup("hayir") == 86
